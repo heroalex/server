@@ -31,19 +31,21 @@ EOF
 )
 
 # Execute curl command
-response=$(curl -s -X POST \
+response=$(curl -s -w "\n%{http_code}" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${API_TOKEN}" \
   -d "$payload" \
   "$API_URL")
 
-# Check for errors in the response
-if echo "$response" | grep -q "error"; then
-    echo "Error creating server:"
-    echo "$response" | jq .
+http_code=$(echo "$response" | tail -n1)
+body=$(echo "$response" | sed '$d')
+
+# Check HTTP status code
+if [ "$http_code" -eq 201 ]; then
+    echo "Server creation successful!"
+else
+    echo "Error creating server. HTTP Status Code: $http_code"
+    echo "Error details:"
+    echo "$body" | jq .
     exit 1
 fi
-
-# Print server details
-echo "Server creation response:"
-echo "$response" | jq .
