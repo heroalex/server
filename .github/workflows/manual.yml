@@ -10,6 +10,9 @@ on:
         server-name:
           required: true
           type: string
+        user-name:
+          required: true
+          type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,4 +28,4 @@ jobs:
             
     # Runs a single command using the runners shell
     - name: run script
-      run: bash scripts/create_server.sh ${{ secrets.FW_ID }} ${{ inputs.server-name }} ${{ secrets.IP_ID }} ${{ secrets.SSH_ID }} ${{ secrets.USER }} ${{ secrets.SSH_KEY }} ${{ secrets.WG_PRIV_KEY }} ${{ secrets.WG_PUB_KEY }} ${{ secrets.API_TOKEN }}
+      run: bash scripts/create_server.sh ${{ secrets.FW_ID }} ${{ inputs.server-name }} ${{ secrets.IP_ID }} ${{ secrets.SSH_ID }} ${{ inputs.user-name }} ${{ secrets.SSH_KEY }} ${{ secrets.WG_PRIV_KEY }} ${{ secrets.WG_PUB_KEY }} ${{ secrets.API_TOKEN }}
