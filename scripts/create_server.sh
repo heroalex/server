@@ -1,17 +1,13 @@
 #!/bin/bash
 
 # Check if all required arguments are provided
-if [ $# -ne 8 ]; then
-    echo "Usage: $0 <firewall_id> <server_name> <public_ipv4_id> <ssh_key_id> <username> <ssh_public_key> <wireguard_private_key> <wireguard_public_key>"
+if [ $# -ne 9 ]; then
+    echo "Usage: $0 <firewall_id> <server_name> <public_ipv4_id> <ssh_key_id> <username> <ssh_public_key> <wireguard_private_key> <wireguard_public_key> <api_token>"
     exit 1
 fi
 
 # Hetzner API endpoint
 API_URL="https://api.hetzner.cloud/v1/servers"
-
-# API Token - IMPORTANT: Replace this with your actual Hetzner API token
-# Best practice: Use an environment variable or pass it as a parameter
-API_TOKEN="${HETZNER_API_TOKEN:-YOUR_API_TOKEN_HERE}"
 
 # Construct JSON payload
 payload=$(cat <<EOF
@@ -43,7 +39,7 @@ EOF
 # Execute curl command
 response=$(curl -s -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_TOKEN" \
+  -H "Authorization: Bearer $9" \
   -d "$payload" \
   "$API_URL")
 
