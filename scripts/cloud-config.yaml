@@ -72,3 +72,8 @@ runcmd:
   - [systemctl, restart, ssh]
   - [git, clone, https://github.com/heroalex/server.git]
   - [find, server/userhome/., -type, f, -name, '*', -exec, bash, -c, 'cp "$0" /home/al/ && chown al:al "/home/al/$(basename "$0")";', {}, \;]
+
+power_state:
+  mode: reboot
+  timeout: 300
+  condition: True
