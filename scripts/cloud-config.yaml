@@ -1,1 +1,74 @@
-#cloud-config\nusers:\n  - name: ${USER_NAME}\n    sudo: ['ALL=(ALL) NOPASSWD:ALL']\n    shell: /bin/bash\n    ssh_authorized_keys:\n      - \"${SSH_KEY}\"\n\npackage_upgrade: true\npackages:\n  - wireguard\n  - podman\n\nwrite_files:\n  - path: /etc/wireguard/wg0.conf\n    content: |\n      [Interface]\n      PrivateKey = ${WG_PRIV_KEY}\n      ListenPort = 13231\n      Address = 172.16.16.1/24\n\n      [Peer]\n      PublicKey = ${WG_PUB_KEY}\n      AllowedIPs = 172.16.16.90/32\n    permissions: '0600'\n\n  - path: /etc/systemd/system/wg-quick@.service.d/override.conf\n    content: |\n      [Unit]\n      Before=sshd.service\n      \n      [Service]\n      Type=oneshot\n      RemainAfterExit=yes\n    permissions: '0644'\n\n  - path: /etc/ssh/sshd_config\n    content: |\n      Port 22\n      Protocol 2\n      PermitRootLogin no\n      PubkeyAuthentication yes\n      PasswordAuthentication no\n      ChallengeResponseAuthentication no\n      UsePAM no\n      X11Forwarding no\n      AllowTcpForwarding no\n      AllowAgentForwarding no\n      PermitTunnel no\n      PrintMotd no\n      AcceptEnv LANG LC_*\n      AllowUsers ${USER_NAME}\n      ListenAddress 172.16.16.1\n\nruncmd:\n  - usermod -p '*' ${USER_NAME}\n  - systemctl daemon-reload\n  - systemctl enable wg-quick@wg0\n  - systemctl start wg-quick@wg0\n  - systemctl restart ssh\n  - reboot\n
+#cloud-config
+users:
+  - name: ${USER_NAME}
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - \"${SSH_KEY}\"
+
+package_upgrade: true
+packages:
+  - wireguard
+  - podman
+
+write_files:
+  - path: /etc/wireguard/wg0.conf
+    content: |
+      [Interface]
+      PrivateKey = ${WG_PRIV_KEY}
+      ListenPort = 13231
+      Address = 172.16.16.1/24
+
+      [Peer]
+      PublicKey = ${WG_PUB_KEY}
+      AllowedIPs = 172.16.16.90/32
+    permissions: '0600'
+
+  - path: /etc/systemd/system/wg-quick@.service.d/override.conf
+    content: |
+      [Unit]
+      Before=ssh.service
+      
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+    permissions: '0644'
+
+  - path: /etc/ssh/sshd_config
+    content: |
+      Port 22
+      Protocol 2
+      PermitRootLogin no
+      PubkeyAuthentication yes
+      PasswordAuthentication no
+      ChallengeResponseAuthentication no
+      UsePAM no
+      X11Forwarding no
+      AllowTcpForwarding no
+      AllowAgentForwarding no
+      PermitTunnel no
+      PrintMotd yes
+      AcceptEnv LANG LC_*
+      AllowUsers ${USER_NAME}
+      ListenAddress 172.16.16.1
+
+  - path: /etc/sysctl.conf
+    content: |
+      net.ipv4.ip_forward=1
+      vm.swappiness = 10
+      vm.vfs_cache_pressure=50
+      vm.overcommit_memory = 1
+    permissions: '0644'
+
+runcmd:
+  - usermod -p '*' ${USER_NAME}
+  - systemctl daemon-reload
+  - systemctl enable wg-quick@wg0
+  - systemctl start wg-quick@wg0
+  - systemctl restart ssh
+  - dd if=/dev/zero of=/swapfile bs=1024 count=4194304
+  - chmod 600 /swapfile
+  - mkswap /swapfile
+  - swapon /swapfile
+  - echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
+  - reboot
