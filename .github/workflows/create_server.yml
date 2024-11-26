@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Manual workflow
+name: Create Server
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -8,9 +8,6 @@ on:
   workflow_dispatch:
       inputs:
         server_name:
-          required: true
-          type: string
-        user_name:
           required: true
           type: string
 
@@ -33,7 +30,7 @@ jobs:
         server_name: ${{ inputs.server_name }}
         IP_ID: ${{ secrets.IP_ID }}
         SSH_ID: ${{ secrets.SSH_ID }}
-        user_name: ${{ inputs.user_name }}
+        USER_NAME: ${{ secrets.USER_NAME }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
         WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
         WG_PUB_KEY: ${{ secrets.WG_PUB_KEY }}
