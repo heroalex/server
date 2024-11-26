@@ -9,20 +9,20 @@ cloud_config=$(envsubst < "scripts/cloud-config.yaml" | sed ':a;N;$!ba;s/\n/\\n/
 payload=$(cat <<EOF
 {
   "automount": false,
-  "datacenter": "nbg1-dc3",
+  "datacenter": "${datacenter}",
   "firewalls": [
     {
       "firewall": ${FW_ID}
     }
   ],
-  "image": "ubuntu-22.04",
+  "image": "${image}",
   "name": "${server_name}",
   "public_net": {
     "enable_ipv4": true,
     "enable_ipv6": false,
     "ipv4": ${IP_ID}
   },
-  "server_type": "cx22",
+  "server_type": "${server_type}",
   "ssh_keys": [
     ${SSH_ID}
   ],

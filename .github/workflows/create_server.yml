@@ -6,16 +6,43 @@ name: Create Server
 # or API.
 on:
   workflow_dispatch:
-      inputs:
-        server_name:
-          required: true
-          type: string
-        user_name:
-          default: "al"
-          required: true
-          type: string
+    inputs:
+      server_name:
+        description: ""
+        required: true
+        type: string
+      user_name:
+        description: ""
+        default: "al"
+        required: true
+        type: string
+      datacenter:
+        description: ""
+        default: "fsn1-dc14"
+        required: true
+        type: choice
+        options:
+          - "fsn1-dc14"
+          - "hel1-dc2"
+          - "nbg1-dc3"
+      image:
+        description: ""
+        default: "ubuntu-22.04"
+        required: true
+        type: choice
+        options:
+          - "ubuntu-22.04"
+          - "rocky-9"
+      server_type:
+        description: ""
+        default: "cx22"
+        required: true
+        type: choice
+        options:
+          - "cx22"
+          - "cx32"
+          - "cax11"
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
   create-server:
@@ -30,11 +57,14 @@ jobs:
     # Runs a single command using the runners shell
     - name: run script
       env:
-        FW_ID: ${{ secrets.FW_ID }}
         server_name: ${{ inputs.server_name }}
+        USER_NAME: ${{ inputs.user_name }}
+        datacenter: ${{ inputs.datacenter }}
+        image: ${{ inputs.image }}
+        server_type: ${{ inputs.server_type }}
+        FW_ID: ${{ secrets.FW_ID }}
         IP_ID: ${{ secrets.IP_ID }}
         SSH_ID: ${{ secrets.SSH_ID }}
-        USER_NAME: ${{ inputs.user_name }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
         WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
         WG_PUB_KEY: ${{ secrets.WG_PUB_KEY }}

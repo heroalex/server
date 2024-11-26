@@ -60,15 +60,13 @@ write_files:
       vm.overcommit_memory = 1
     permissions: '0644'
 
+swap:
+  filename: /swapfile
+  size: auto
+
 runcmd:
-  - usermod -p '*' ${USER_NAME}
-  - systemctl daemon-reload
-  - systemctl enable wg-quick@wg0
-  - systemctl start wg-quick@wg0
-  - systemctl restart ssh
-  - dd if=/dev/zero of=/swapfile bs=1024 count=4194304
-  - chmod 600 /swapfile
-  - mkswap /swapfile
-  - swapon /swapfile
-  - echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
-  - reboot
+  - [usermod, -p, '*', ${USER_NAME}]
+  - [systemctl, daemon-reload]
+  - [systemctl, enable, wg-quick@wg0]
+  - [systemctl, start, wg-quick@wg0]
+  - [systemctl, restart, ssh]
