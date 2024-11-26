@@ -70,8 +70,7 @@ runcmd:
   - [systemctl, enable, wg-quick@wg0]
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
-  - [git, clone, https://github.com/heroalex/server.git]
-  - [find, server/userhome/., -type, f, -name, '*', -exec, bash, -c, 'cp "$0" /home/al/ && chown al:al "/home/al/$(basename "$0")";', {}, \;]
+  - [init_userhome.sh]
 
 power_state:
   mode: reboot
