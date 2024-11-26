@@ -4,10 +4,33 @@
 API_URL="https://api.hetzner.cloud/v1/servers"
 
 # Construct JSON payload
-payload=$(envsubst < "scripts/cloud-config.yaml" | sed ':a;N;$!ba;s/\n/\\n/g')
+cloud_config=$(envsubst < "scripts/cloud-config.yaml" | sed ':a;N;$!ba;s/\n/\\n/g')
 
-echo "Payload:"
-echo "$payload"
+payload=$(cat <<EOF
+{
+  "automount": false,
+  "datacenter": "nbg1-dc3",
+  "firewalls": [
+    {
+      "firewall": ${FW_ID}
+    }
+  ],
+  "image": "ubuntu-22.04",
+  "name": "${server_name}",
+  "public_net": {
+    "enable_ipv4": true,
+    "enable_ipv6": false,
+    "ipv4": ${IP_ID}
+  },
+  "server_type": "cx22",
+  "ssh_keys": [
+    ${SSH_ID}
+  ],
+  "start_after_create": true,
+  "user_data": "${cloud_config}"
+}
+EOF
+)
 
 # Execute curl command
 response=$(curl -s -w "\n%{http_code}" \
