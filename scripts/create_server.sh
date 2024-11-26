@@ -4,7 +4,7 @@
 API_URL="https://api.hetzner.cloud/v1/servers"
 
 # Construct JSON payload
-payload=$(envsubst < "cloud-config.yaml" | sed ':a;N;$!ba;s/\n/\\n/g')
+payload=$(envsubst < "scripts/cloud-config.yaml" | sed ':a;N;$!ba;s/\n/\\n/g')
 
 echo "Payload:"
 echo "$payload"
