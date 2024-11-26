@@ -70,8 +70,8 @@ runcmd:
   - [systemctl, enable, wg-quick@wg0]
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
-  - [git, clone, https://github.com/heroalex/server.git]
-  - [server/scripts/init_userhome.sh]
+  - [git, clone, https://github.com/heroalex/server.git, ~/server]
+  - [~/server/scripts/init_userhome.sh]
 
 power_state:
   mode: reboot
