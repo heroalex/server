@@ -63,7 +63,7 @@ jobs:
         image: ${{ inputs.image }}
         server_type: ${{ inputs.server_type }}
         FW_ID: ${{ secrets.FW_ID }}
-        IP_ID: ${{ secrets.IP_ID }}
+        IP_ID: ${{ contains(inputs.datacenter,'nbg') && secrets.IP_ID_NBG || contains(inputs.datacenter,'fsn') && secrets.IP_ID_FSN }}
         SSH_ID: ${{ secrets.SSH_ID }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
         WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
