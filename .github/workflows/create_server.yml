@@ -10,6 +10,10 @@ on:
         server_name:
           required: true
           type: string
+        user_name:
+          default: "al"
+          required: true
+          type: string
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -30,7 +34,7 @@ jobs:
         server_name: ${{ inputs.server_name }}
         IP_ID: ${{ secrets.IP_ID }}
         SSH_ID: ${{ secrets.SSH_ID }}
-        USER_NAME: ${{ secrets.USER_NAME }}
+        USER_NAME: ${{ inputs.user_name }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
         WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
         WG_PUB_KEY: ${{ secrets.WG_PUB_KEY }}
