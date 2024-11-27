@@ -76,7 +76,7 @@ runcmd:
   - [systemctl, restart, ssh]
   - [git, clone, https://github.com/heroalex/server.git, /root/server]
   - [chmod, +x, /root/server/scripts/init_userhome.sh]
-  - [/root/server/scripts/init_userhome.sh]
+  - [/root/server/scripts/init_userhome.sh, ${USER_NAME}]
 
 power_state:
   mode: reboot
