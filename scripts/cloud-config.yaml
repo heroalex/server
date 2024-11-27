@@ -73,6 +73,8 @@ runcmd:
   - [systemctl, enable, wg-quick@wg0]
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
+  - [git, config, --global, user.name, 'alex']
+  - [git, config, --global, user.email, 'alex@eyesqubes.com']
   - [git, clone, https://github.com/heroalex/server.git, /root/server]
   - [/root/server/scripts/init_userhome.sh]
 
