@@ -10,6 +10,7 @@ package_upgrade: true
 packages:
   - wireguard
   - podman
+  - lxd
 
 write_files:
   - path: /etc/wireguard/wg0.conf
