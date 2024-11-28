@@ -17,11 +17,11 @@ users:
     system: true
     uid: 1002
 
-package_upgrade: true
+package_upgrade: false
 packages:
-  - wireguard
+#  - wireguard
   - podman
-  - lxd
+#  - lxd
   - systemd-container
   - cifs-utils
 
@@ -103,16 +103,16 @@ write_files:
       password=${STORAGE_L1}
     permissions: '0600'
 
-swap:
-  filename: /swapfile
-  size: auto
+#swap:
+#  filename: /swapfile
+#  size: auto
 
 runcmd:
-  - [usermod, -p, '*', ${USER_NAME}]
-  - [systemctl, daemon-reload]
-  - [systemctl, enable, wg-quick@wg0]
-  - [systemctl, start, wg-quick@wg0]
-  - [systemctl, restart, ssh]
+#  - [usermod, -p, '*', ${USER_NAME}]
+#  - [systemctl, daemon-reload]
+#  - [systemctl, enable, wg-quick@wg0]
+#  - [systemctl, start, wg-quick@wg0]
+#  - [systemctl, restart, ssh]
 # init users
   - [ git, clone, https://github.com/heroalex/server.git, /root/server ]
 # user
@@ -127,7 +127,7 @@ runcmd:
 # test_cloud-config
   - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
 
-power_state:
-  mode: reboot
-  timeout: 300
-  condition: True
+#power_state:
+#  mode: reboot
+#  timeout: 300
+#  condition: True
