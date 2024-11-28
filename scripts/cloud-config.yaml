@@ -17,11 +17,11 @@ users:
     system: true
     uid: 998
 
-package_upgrade: true
+package_upgrade: false
 packages:
-  - wireguard
+#  - wireguard
   - podman
-  - lxd
+#  - lxd
   - systemd-container
   - cifs-utils
 
@@ -112,16 +112,16 @@ write_files:
         }
       }
 
-swap:
-  filename: /swapfile
-  size: auto
+#swap:
+#  filename: /swapfile
+#  size: auto
 
 runcmd:
-  - [usermod, -p, '*', ${USER_NAME}]
-  - [systemctl, daemon-reload]
-  - [systemctl, enable, wg-quick@wg0]
-  - [systemctl, start, wg-quick@wg0]
-  - [systemctl, restart, ssh]
+#  - [usermod, -p, '*', ${USER_NAME}]
+#  - [systemctl, daemon-reload]
+#  - [systemctl, enable, wg-quick@wg0]
+#  - [systemctl, start, wg-quick@wg0]
+#  - [systemctl, restart, ssh]
   - [mkdir, -p, /mnt/storage-L1]
   - [systemctl, enable, storage-L1.mount]
   - [systemctl, start, storage-L1.mount]
@@ -136,7 +136,7 @@ runcmd:
   - [/root/server/scripts/init_nginxuser.sh, nginxuser]
   - [su, -c, /home/nginxuser/init_nginx.sh, nginxuser]
 
-power_state:
-  mode: reboot
-  timeout: 300
-  condition: True
+#power_state:
+#  mode: reboot
+#  timeout: 300
+#  condition: True
