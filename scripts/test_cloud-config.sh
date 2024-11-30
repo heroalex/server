@@ -1,9 +1,9 @@
 #!/bin/bash
 
-USER_NAME=user_name
-SSH_KEY=sshkey
-WG_PRIV_KEY=wg_priv_key
-WG_PUB_KEY=wg_pub_key
+export USER_NAME=user_name
+export SSH_KEY=sshkey
+export WG_PRIV_KEY=wg_priv_key
+export WG_PUB_KEY=wg_pub_key
 
 git clone -b test-config https://github.com/heroalex/server.git /root/server-test
 
@@ -42,7 +42,7 @@ cluster: null
 EOF
 
 lxc init ubuntu:22.04 u1
-lxc config set u1 user.user-data "$(envsubst < "server-test/scripts/cloud-config.yaml")"
+envsubst < "server-test/scripts/cloud-config.yaml" | lxc config set u1 user.user-data "$(cat)"
 lxc config set u1 security.nesting=true
 lxc config set u1 security.privileged=true
 lxc start u1

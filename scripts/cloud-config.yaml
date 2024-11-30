@@ -15,6 +15,7 @@ packages:
   - wireguard
   - podman
   - lxd
+  - systemd-container
 
 write_files:
   - path: /etc/wireguard/wg0.conf
@@ -89,7 +90,6 @@ write_files:
       [Install]
       WantedBy=default.target
     permissions: '0644'
-    owner: nginxuser:nginxuser
 
   - path: /home/nginxuser/nginx/conf/nginx.conf
     content: |
@@ -120,7 +120,6 @@ write_files:
           }
       }
     permissions: '0644'
-    owner: nginxuser:nginxuser
 
   - path: /home/nginxuser/nginx/html/index.html
     content: |
@@ -135,7 +134,6 @@ write_files:
       </body>
       </html>
     permissions: '0644'
-    owner: nginxuser:nginxuser
 
 swap:
   filename: /swapfile
@@ -155,8 +153,8 @@ runcmd:
   - [mkdir, -p, /home/nginxuser/nginx/conf, /home/nginxuser/nginx/html, /home/nginxuser/nginx/certs]
   - [chown, -R, nginxuser:nginxuser, /home/nginxuser]
   - [loginctl, enable-linger, nginxuser]
-  - [sudo, -u, nginxuser, systemctl, --user, daemon-reload]
-  - [sudo, -u, nginxuser, systemctl, --user, enable, --now, container-nginx]
+  - [machinectl, shell, nginxuser@, /bin/systemctl, --user, daemon-reload]
+  - [machinectl, shell, nginxuser@, /bin/systemctl, --user, enable, --now, container-nginx]
 
 power_state:
   mode: reboot
