@@ -152,7 +152,7 @@ runcmd:
   - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
   - [/root/server/scripts/init_userhome.sh, ${USER_NAME}]
   - [mkdir, -p, /home/nginxuser/.config/containers/systemd]
-  - [mkdir, -p, /home/nginxuser/nginx/{conf,html,certs}]
+  - [mkdir, -p, /home/nginxuser/nginx/conf, /home/nginxuser/nginx/html, /home/nginxuser/nginx/certs]
   - [chown, -R, nginxuser:nginxuser, /home/nginxuser]
   - [loginctl, enable-linger, nginxuser]
   - [sudo, -u, nginxuser, systemctl, --user, daemon-reload]
