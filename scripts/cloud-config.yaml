@@ -83,6 +83,8 @@ write_files:
       Volume=/home/nginxuser/nginx/conf:/etc/nginx:ro
       Volume=/home/nginxuser/nginx/html:/usr/share/nginx/html:ro
       Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
+      User=nginxuser
+      Group=nginxuser
 
       [Service]
       Restart=always
@@ -153,8 +155,8 @@ runcmd:
   - [mkdir, -p, /home/nginxuser/nginx/conf, /home/nginxuser/nginx/html, /home/nginxuser/nginx/certs]
   - [chown, -R, nginxuser:nginxuser, /home/nginxuser]
   - [loginctl, enable-linger, nginxuser]
-  - [machinectl, shell, nginxuser@, /bin/systemctl, --user, daemon-reload]
-  - [machinectl, shell, nginxuser@, /bin/systemctl, --user, enable, --now, container-nginx]
+  - [systemctl, --user, -M, nginxuser@, daemon-reload]
+  - [systemctl, --user, -M, nginxuser@, enable, --now, container-nginx]
 
 power_state:
   mode: reboot
