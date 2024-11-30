@@ -76,11 +76,11 @@ write_files:
       label=true
       
       [engine]
-      runtime="crun"
+      runtime=\"crun\"
       
       [engine.runtimes]
       crun = [
-          "/usr/bin/crun"
+          \"/usr/bin/crun\"
       ]
     permissions: '0644'
 
