@@ -1,0 +1,20 @@
+[Unit]
+Description=Nginx Container
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+Image=docker.io/library/nginx:stable-alpine
+PublishPort=80:80
+PublishPort=443:443
+Volume=/home/nginxuser/nginx/conf:/etc/nginx:ro
+Volume=/home/nginxuser/nginx/html:/usr/share/nginx/html:ro
+Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
+User=nginxuser
+Group=nginxuser
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
