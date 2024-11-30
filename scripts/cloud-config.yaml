@@ -69,6 +69,8 @@ write_files:
       vm.vfs_cache_pressure=50
       vm.overcommit_memory = 1
       net.ipv4.ip_unprivileged_port_start=80
+      kernel.unprivileged_userns_clone=1
+      user.max_user_namespaces=28633
     permissions: '0644'
 
 swap:
@@ -82,6 +84,8 @@ runcmd:
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
   - [loginctl, enable-linger, nginxuser]
+  - [usermod, --add-subuids, 100000-165535, nginxuser]
+  - [usermod, --add-subgids, 100000-165535, nginxuser]
   - [git, clone, https://github.com/heroalex/server.git, /root/server]
   - [chmod, +x, /root/server/scripts/init_userhome.sh]
   - [chmod, +x, /root/server/scripts/init_nginxuser.sh]
