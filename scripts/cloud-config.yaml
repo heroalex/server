@@ -6,6 +6,10 @@ users:
     ssh_authorized_keys:
       - \"${SSH_KEY}\"
 
+  - name: nginxuser
+    shell: /bin/bash
+    system: true
+
 package_upgrade: true
 packages:
   - wireguard
@@ -62,7 +66,76 @@ write_files:
       vm.swappiness = 10
       vm.vfs_cache_pressure=50
       vm.overcommit_memory = 1
+      net.ipv4.ip_unprivileged_port_start=80
     permissions: '0644'
+
+  - path: /home/nginxuser/.config/containers/systemd/nginx.container
+    content: |
+      [Unit]
+      Description=Nginx Container
+      After=network-online.target
+
+      [Container]
+      Image=docker.io/library/nginx:stable-alpine
+      PublishPort=80:80
+      PublishPort=443:443
+      Volume=/home/nginxuser/nginx/conf:/etc/nginx:ro
+      Volume=/home/nginxuser/nginx/html:/usr/share/nginx/html:ro
+      Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
+
+      [Service]
+      Restart=always
+
+      [Install]
+      WantedBy=default.target
+    permissions: '0644'
+    owner: nginxuser:nginxuser
+
+  - path: /home/nginxuser/nginx/conf/nginx.conf
+    content: |
+      events {
+          worker_connections 1024;
+      }
+
+      http {
+          include       /etc/nginx/mime.types;
+          default_type  application/octet-stream;
+
+          sendfile        on;
+          keepalive_timeout  65;
+
+          server {
+              listen       80;
+              server_name  localhost;
+
+              location / {
+                  root   /usr/share/nginx/html;
+                  index  index.html;
+              }
+
+              error_page   500 502 503 504  /50x.html;
+              location = /50x.html {
+                  root   /usr/share/nginx/html;
+              }
+          }
+      }
+    permissions: '0644'
+    owner: nginxuser:nginxuser
+
+  - path: /home/nginxuser/nginx/html/index.html
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Welcome to nginx!</title>
+      </head>
+      <body>
+          <h1>Welcome to nginx!</h1>
+          <p>If you see this page, the nginx container is working correctly.</p>
+      </body>
+      </html>
+    permissions: '0644'
+    owner: nginxuser:nginxuser
 
 swap:
   filename: /swapfile
@@ -78,6 +151,12 @@ runcmd:
   - [chmod, +x, /root/server/scripts/init_userhome.sh]
   - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
   - [/root/server/scripts/init_userhome.sh, ${USER_NAME}]
+  - [mkdir, -p, /home/nginxuser/.config/containers/systemd]
+  - [mkdir, -p, /home/nginxuser/nginx/{conf,html,certs}]
+  - [chown, -R, nginxuser:nginxuser, /home/nginxuser]
+  - [loginctl, enable-linger, nginxuser]
+  - [sudo, -u, nginxuser, systemctl, --user, daemon-reload]
+  - [sudo, -u, nginxuser, systemctl, --user, enable, --now, container-nginx]
 
 power_state:
   mode: reboot
