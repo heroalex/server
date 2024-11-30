@@ -41,7 +41,7 @@ projects: []
 cluster: null
 EOF
 
-lxc init ubuntu:22.04 u1
+lxc init ubuntu:24.04 u1
 envsubst < "server-test/scripts/cloud-config.yaml" | lxc config set u1 user.user-data "$(cat)"
 lxc config set u1 security.nesting=true
 lxc config set u1 security.privileged=true
