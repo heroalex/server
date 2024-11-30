@@ -3,12 +3,19 @@ users:
   - name: ${USER_NAME}
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
+    uid: 1000
     ssh_authorized_keys:
       - \"${SSH_KEY}\"
 
   - name: nginxuser
     shell: /bin/bash
     system: true
+    uid: 999
+
+  - name: storage_l1
+    shell: /bin/bash
+    system: true
+    uid: 998
 
 package_upgrade: true
 packages:
@@ -16,6 +23,7 @@ packages:
   - podman
   - lxd
   - systemd-container
+  - cifs-utils
 
 write_files:
   - path: /etc/wireguard/wg0.conf
@@ -69,9 +77,40 @@ write_files:
       vm.vfs_cache_pressure=50
       vm.overcommit_memory = 1
       net.ipv4.ip_unprivileged_port_start=80
-#      kernel.unprivileged_userns_clone=1
-#      user.max_user_namespaces=28633
     permissions: '0644'
+
+  - path: /etc/systemd/system/mnt-storage-L1.mount
+    content: |
+      [Unit]
+      Description=Hetzner Storage Box CIFS Mount L1
+      Requires=network-online.target
+      After=network-online.target
+      
+      [Mount]
+      What=//u324047-sub5.your-storagebox.de/u324047-sub5
+      Where=/mnt/storage-L1
+      Type=cifs
+      Options=vers=3.0,credentials=/etc/storage-L1.credentials,uid=998,gid=998,file_mode=0660,dir_mode=0770,_netdev
+      TimeoutSec=30
+      
+      [Install]
+      WantedBy=multi-user.target
+
+  - path: /etc/storage-L1.credentials
+    permissions: '0600'
+    content: |
+      username=u324047-sub5
+      password=${STORAGE_L1}
+
+  - path: /run/user/999/containers/auth.json
+    content: |
+      {
+        \"auths\": {
+                \"docker.io\": {
+                        \"auth\": \"${DOCKER_IO}\"
+                }
+        }
+      }
 
 swap:
   filename: /swapfile
@@ -83,6 +122,9 @@ runcmd:
   - [systemctl, enable, wg-quick@wg0]
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
+  - [mkdir, -p, /mnt/storage-L1]
+  - [systemctl, enable, mnt-storage-L1]
+  - [systemctl, start, mnt-storage-L1]
   - [loginctl, enable-linger, nginxuser]
   - [usermod, --add-subuids, 100000-165535, nginxuser]
   - [usermod, --add-subgids, 100000-165535, nginxuser]
@@ -92,7 +134,7 @@ runcmd:
   - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
   - [/root/server/scripts/init_userhome.sh, ${USER_NAME}]
   - [/root/server/scripts/init_nginxuser.sh, nginxuser]
-#  - [su, -c, /home/nginxuser/init_nginx.sh, nginxuser]
+  - [su, -c, /home/nginxuser/init_nginx.sh, nginxuser]
 
 power_state:
   mode: reboot

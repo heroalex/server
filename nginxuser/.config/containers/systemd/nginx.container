@@ -10,8 +10,6 @@ PublishPort=443:443
 Volume=/home/nginxuser/nginx/conf:/etc/nginx:ro
 Volume=/home/nginxuser/nginx/html:/usr/share/nginx/html:ro
 Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
-User=nginxuser
-Group=nginxuser
 
 [Service]
 Restart=always

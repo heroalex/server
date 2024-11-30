@@ -70,4 +70,5 @@ jobs:
         WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
         WG_PUB_KEY: ${{ secrets.WG_PUB_KEY }}
         API_TOKEN: ${{ secrets.API_TOKEN }}
+        STORAGE_L1: ${{ secrets.STORAGE_L1 }}
       run: bash scripts/create_server.sh
