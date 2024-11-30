@@ -12,8 +12,9 @@ users:
 
 package_upgrade: true
 packages:
-  - wireguard-tools
+  - wireguard
   - podman
+  - lxd
   - systemd-container
 
 write_files:
@@ -32,7 +33,7 @@ write_files:
   - path: /etc/systemd/system/wg-quick@.service.d/override.conf
     content: |
       [Unit]
-      Before=sshd.service
+      Before=ssh.service
       
       [Service]
       Type=oneshot
@@ -70,20 +71,6 @@ write_files:
       net.ipv4.ip_unprivileged_port_start=80
     permissions: '0644'
 
-  - path: /etc/containers/containers.conf
-    content: |
-      [containers]
-      label=true
-      
-      [engine]
-      runtime=\"crun\"
-      
-      [engine.runtimes]
-      crun = [
-          \"/usr/bin/crun\"
-      ]
-    permissions: '0644'
-
   - path: /home/nginxuser/.config/containers/systemd/nginx.container
     content: |
       [Unit]
@@ -99,7 +86,6 @@ write_files:
       Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
       User=nginxuser
       Group=nginxuser
-      SecurityLabelType=container_runtime_t
 
       [Service]
       Restart=always
@@ -157,15 +143,11 @@ swap:
   size: auto
 
 runcmd:
-  - [dnf, -y, install, epel-release]
-  - [dnf, -y, install, wireguard-tools]
-  - [semanage, port, -a, -t, http_port_t, -p, tcp, 13231]
-  - [setsebool, -P, container_manage_cgroup, 1]
   - [usermod, -p, '*', ${USER_NAME}]
   - [systemctl, daemon-reload]
   - [systemctl, enable, wg-quick@wg0]
   - [systemctl, start, wg-quick@wg0]
-  - [systemctl, restart, sshd]
+  - [systemctl, restart, ssh]
   - [git, clone, https://github.com/heroalex/server.git, /root/server]
   - [chmod, +x, /root/server/scripts/init_userhome.sh]
   - [chmod, +x, /root/server/scripts/test_cloud-config.sh]

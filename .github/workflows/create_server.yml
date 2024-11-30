@@ -27,10 +27,11 @@ on:
           - "nbg1-dc3"
       image:
         description: ""
-        default: "ubuntu-22.04"
+        default: "ubuntu-24.04"
         required: true
         type: choice
         options:
+          - "ubuntu-24.04"
           - "ubuntu-22.04"
           - "rocky-9"
       server_type:
