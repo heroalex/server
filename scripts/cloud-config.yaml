@@ -79,7 +79,7 @@ write_files:
       net.ipv4.ip_unprivileged_port_start=80
     permissions: '0644'
 
-  - path: /etc/systemd/system/mnt-storage-L1.mount
+  - path: /etc/systemd/system/storage-L1.mount
     content: |
       [Unit]
       Description=Hetzner Storage Box CIFS Mount L1
@@ -123,8 +123,8 @@ runcmd:
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
   - [mkdir, -p, /mnt/storage-L1]
-  - [systemctl, enable, mnt-storage-L1]
-  - [systemctl, start, mnt-storage-L1]
+  - [systemctl, enable, storage-L1.mount]
+  - [systemctl, start, storage-L1.mount]
   - [loginctl, enable-linger, nginxuser]
   - [usermod, --add-subuids, 100000-165535, nginxuser]
   - [usermod, --add-subgids, 100000-165535, nginxuser]
