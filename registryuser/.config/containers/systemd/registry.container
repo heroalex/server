@@ -1,7 +1,7 @@
 [Unit]
 Description=Docker Registry Container
-Wants=network-online.target
-After=network-online.target
+Wants=home-registryuser-storage.mount
+After=home-registryuser-storage.mount
 
 [Container]
 Image=docker.io/library/registry:2
