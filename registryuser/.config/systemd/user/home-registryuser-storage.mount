@@ -11,4 +11,4 @@ Options=vers=3.0,credentials=/home/registryuser/creds-storage,uid=1001,gid=1001,
 TimeoutSec=30
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
