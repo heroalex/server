@@ -3,26 +3,26 @@ users:
   - name: ${USER_NAME}
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
-    uid: 1000
     ssh_authorized_keys:
       - \"${SSH_KEY}\"
 
   - name: registryuser
     shell: /bin/bash
     system: true
-    uid: 1001
 
   - name: nginxuser
     shell: /bin/bash
     system: true
-    uid: 1002
+
+  - name: camuser
+    shell: /bin/bash
+    system: true
 
 package_upgrade: true
 packages:
   - wireguard
   - podman
   - slirp4netns
-#  - lxd
   - systemd-container
   - cifs-utils
 
@@ -91,7 +91,7 @@ write_files:
       What=//u324047-sub5.your-storagebox.de/u324047-sub5
       Where=/home/registryuser/storage
       Type=cifs
-      Options=vers=3.0,uid=1001,gid=1001,credentials=/home/registryuser/.smbcredentials,file_mode=0660,dir_mode=0770,rw,_netdev
+      Options=vers=3.0,uid=registryuser,gid=registryuser,credentials=/home/registryuser/.smbcredentials,file_mode=0660,dir_mode=0770,rw,_netdev
       TimeoutSec=30
       
       [Install]
@@ -103,6 +103,29 @@ write_files:
       username=u324047-sub5
       password=${STORAGE_L1}
     permissions: '0600'
+
+  - path: /etc/containers/registries.conf.d/00-local-registry.conf
+    content: |
+      unqualified-search-registries = [\"localhost:5000\"]
+      
+      [[registry]]
+      location = \"localhost:5000\"
+      insecure = true
+      
+      [[registry]]
+      prefix=\"docker.io\"
+
+      [[registry.mirror]]
+      location = \"localhost:5005\"
+      insecure = true
+      
+      [[registry]]
+      prefix=\"quay.io\"
+      
+      [[registry.mirror]]
+      location = \"localhost:5010\"
+      insecure = true
+    permissions: '0644'
 
 swap:
   filename: /swapfile

@@ -1,0 +1,17 @@
+[Unit]
+Description=Docker Registry Container
+Wants=home-registryuser-storage.mount
+After=home-registryuser-storage.mount
+
+[Container]
+Image=docker.io/library/registry:2
+PublishPort=5005:5000
+Volume=/home/registryuser/storage/docker:/var/lib/registry:Z
+Environment=REGISTRY_PROXY_REMOTEURL=https://docker.io
+Environment=REGISTRY_PROXY_TTL=0
+
+[Service]
+Restart=no
+
+[Install]
+WantedBy=default.target
