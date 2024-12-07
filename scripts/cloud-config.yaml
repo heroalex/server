@@ -21,7 +21,8 @@ package_upgrade: true
 packages:
   - wireguard
   - podman
-  - lxd
+  - slirp4netns
+#  - lxd
   - systemd-container
   - cifs-utils
 

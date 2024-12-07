@@ -9,7 +9,7 @@ PublishPort=5000:5000
 Volume=/home/registryuser/storage:/var/lib/registry:Z
 
 [Service]
-Restart=always
+Restart=no
 
 [Install]
 WantedBy=default.target

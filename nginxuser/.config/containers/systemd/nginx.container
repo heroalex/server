@@ -12,7 +12,7 @@ Volume=/home/nginxuser/nginx/html:/usr/share/nginx/html:ro
 Volume=/home/nginxuser/nginx/certs:/etc/nginx/certs:ro
 
 [Service]
-Restart=always
+Restart=no
 
 [Install]
 WantedBy=default.target
