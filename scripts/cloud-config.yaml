@@ -79,7 +79,25 @@ write_files:
       net.ipv4.ip_unprivileged_port_start=80
     permissions: '0644'
 
-  - path: /home/registryuser/creds-storage
+  - path: /etc/systemd/system/home-registryuser-storage.mount
+    content: |
+      [Unit]
+      Description=CIFS Mount for registryuser storage
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Mount]
+      What=//u324047-sub5.your-storagebox.de/u324047-sub5
+      Where=/home/registryuser/storage
+      Type=cifs
+      Options=vers=3.0,uid=1001,gid=1001,credentials=/home/registryuser/.smbcredentials,file_mode=0660,dir_mode=0770,rw,_netdev
+      TimeoutSec=30
+      
+      [Install]
+      WantedBy=default.target
+    permissions: '0644'
+
+  - path: /home/registryuser/.smbcredentials
     content: |
       username=u324047-sub5
       password=${STORAGE_L1}

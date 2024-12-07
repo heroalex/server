@@ -8,4 +8,8 @@ loginctl enable-linger $1
 usermod --add-subuids 200000-265535 $1
 usermod --add-subgids 200000-265535 $1
 
+systemctl daemon-reload
+systemctl enable home-$1-storage.mount
+systemctl start home-$1-storage.mount
+
 su -c /home/$1/init_registry.sh $1
