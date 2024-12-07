@@ -17,6 +17,11 @@ users:
     system: true
     uid: 998
 
+  - name: registryuser
+    shell: /bin/bash
+    system: true
+    uid: 997
+
 package_upgrade: true
 packages:
   - wireguard
@@ -95,8 +100,15 @@ write_files:
       
       [Install]
       WantedBy=multi-user.target
+    permissions: '0644'
 
   - path: /etc/storage-L1.credentials
+    permissions: '0600'
+    content: |
+      username=u324047-sub5
+      password=${STORAGE_L1}
+
+  - path: /home/registryuser/creds-storage
     permissions: '0600'
     content: |
       username=u324047-sub5
@@ -125,16 +137,26 @@ runcmd:
   - [mkdir, -p, /mnt/storage-L1]
   - [systemctl, enable, storage-L1.mount]
   - [systemctl, start, storage-L1.mount]
+# init users
+  - [ git, clone, https://github.com/heroalex/server.git, /root/server ]
+# user
+  - [ chmod, +x, /root/server/scripts/init_userhome.sh ]
+  - [ /root/server/scripts/init_userhome.sh, ${ USER_NAME } ]
+# registryuser
+  - [ loginctl, enable-linger, registryuser ]
+  - [ usermod, --add-subuids, 100000-165535, registryuser ]
+  - [ usermod, --add-subgids, 100000-165535, registryuser ]
+  - [ chmod, +x, /root/server/scripts/init_registryuser.sh ]
+  - [ /root/server/scripts/init_registryuser.sh, registryuser ]
+  - [ su, -c, /home/registryuser/init_registry.sh, registryuser ]
+# nginxuser
   - [loginctl, enable-linger, nginxuser]
-  - [usermod, --add-subuids, 100000-165535, nginxuser]
-  - [usermod, --add-subgids, 100000-165535, nginxuser]
-  - [git, clone, https://github.com/heroalex/server.git, /root/server]
-  - [chmod, +x, /root/server/scripts/init_userhome.sh]
+  - [usermod, --add-subuids, 200000-265535, nginxuser]
+  - [usermod, --add-subgids, 200000-265535, nginxuser]
   - [chmod, +x, /root/server/scripts/init_nginxuser.sh]
-  - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
-  - [/root/server/scripts/init_userhome.sh, ${USER_NAME}]
   - [/root/server/scripts/init_nginxuser.sh, nginxuser]
-  - [su, -c, /home/nginxuser/init_nginx.sh, nginxuser]
+#  - [su, -c, /home/nginxuser/init_nginx.sh, nginxuser]
+  - [chmod, +x, /root/server/scripts/test_cloud-config.sh]
 
 power_state:
   mode: reboot
