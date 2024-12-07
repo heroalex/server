@@ -141,7 +141,7 @@ runcmd:
   - [ git, clone, https://github.com/heroalex/server.git, /root/server ]
 # user
   - [ chmod, +x, /root/server/scripts/init_userhome.sh ]
-  - [ /root/server/scripts/init_userhome.sh, ${ USER_NAME } ]
+  - [ /root/server/scripts/init_userhome.sh, ${USER_NAME} ]
 # registryuser
   - [ loginctl, enable-linger, registryuser ]
   - [ usermod, --add-subuids, 100000-165535, registryuser ]
