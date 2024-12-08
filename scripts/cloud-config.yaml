@@ -25,6 +25,7 @@ packages:
   - slirp4netns
   - systemd-container
   - cifs-utils
+  - git-lfs
 
 write_files:
   - path: /etc/wireguard/wg0.conf
