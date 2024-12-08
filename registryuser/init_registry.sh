@@ -1,12 +1,8 @@
 #!/bin/bash
 
-podman load -q -i /home/registryuser/.config/containers/storage/registry2.tar
+podman load -q -i /home/registryuser/.config/containers/storage/gitea1.22.tar
 
-mkdir -p /home/registryuser/storage/local
-mkdir -p /home/registryuser/storage/docker
-mkdir -p /home/registryuser/storage/quay
+mkdir -p /home/registryuser/storage/gitea
 
 systemctl --user daemon-reload
-systemctl --user start local-registry
-systemctl --user start docker-mirror-registry
-systemctl --user start quay-mirror-registry
+systemctl --user start gitea
