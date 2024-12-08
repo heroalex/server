@@ -4,7 +4,7 @@ Wants=network-online.target
 After=network-online.target
 
 [Container]
-Image=docker.io/library/nginx:stable-alpine
+Image=docker.io/library/nginxinc/nginx-unprivileged:1-alpine-slim
 PublishPort=80:80
 PublishPort=443:443
 Volume=/home/nginxuser/nginx/conf:/etc/nginx:ro

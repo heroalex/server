@@ -4,21 +4,18 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=docker.io/gitea/gitea:1.22-rootless
+Image=docker.io/gitea/gitea:1-rootless
 ContainerName=gitea
-Volume=%h/storage/gitea:/data:Z
+Volume=%h/storage/gitea/data:/var/lib/gitea:Z
+Volume=%h/storage/gitea/config:/etc/gitea:Z
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 PublishPort=3000:3000
 Environment=USER_UID=%U
 Environment=USER_GID=%G
-Environment=GITEA__database__DB_TYPE=sqlite3
-Environment=GITEA__database__PATH=/data/gitea.db
 Environment=GITEA__server__ROOT_URL=http://localhost:3000
 Environment=GITEA__server__DOMAIN=localhost
 Environment=GITEA__packages__ENABLED=true
-Environment=GITEA__packages__REGISTRY_DB_TYPE=sqlite3
-Environment=GITEA__packages__REGISTRY_DB_DIR=/data/packages
 Environment=GITEA__packages__PULL_PROXY_ENABLED=true
 Environment=GITEA__packages__PULL_PROXY_REGISTRY_HOST=docker.io
 Network=podman
