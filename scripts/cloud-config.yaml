@@ -114,11 +114,11 @@ write_files:
       
       [[registry]]
       prefix=\"docker.io\"
-      location = \"https://docker.io\"
+      location = \"docker.io\"
 
       [[registry]]
       prefix=\"quay.io\"
-      location = \"https://quay.io\"
+      location = \"quay.io\"
     permissions: '0644'
 
 swap:
