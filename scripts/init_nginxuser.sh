@@ -8,4 +8,6 @@ loginctl enable-linger $1
 usermod --add-subuids 300000-365535 $1
 usermod --add-subgids 300000-365535 $1
 
+git lfs install
+
 #su -c /home/$1/init_nginx.sh $1

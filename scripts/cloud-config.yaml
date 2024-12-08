@@ -133,6 +133,7 @@ runcmd:
   - [systemctl, start, wg-quick@wg0]
   - [systemctl, restart, ssh]
 # init users
+  - [ git, lfs, install ]
   - [ git, clone, https://github.com/heroalex/server.git, /root/server ]
 # user
   - [ chmod, +x, /root/server/scripts/init_userhome.sh ]
