@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=docker.io/gitea/gitea:latest
+Image=docker.io/gitea/gitea:1.22-rootless
 ContainerName=gitea
 Volume=%h/storage/gitea:/data:Z
 Volume=/etc/timezone:/etc/timezone:ro
