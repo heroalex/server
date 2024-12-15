@@ -18,6 +18,7 @@ Image=docker.io/dperson/samba:latest
 ContainerName=samba-share
 Volume=/media/cam1:/share/cam1:Z
 Volume=/media/cam2:/share/cam2:Z
+Volume=/media/cam2:/share/cam2:Z
 Network=host
 Environment=SHARE="cam1;/share/cam1;yes;no;yes;all;none;none"
 Environment=SHARE2="cam2;/share/cam2;yes;no;yes;all;none;none"
@@ -25,6 +26,7 @@ Environment=WORKGROUP=WORKGROUP
 Environment=USER="guest;guest"
 Environment=RECYCLE=false
 Environment=PERMISSIONS
+Environment=GROUPID=$(getent group storage-cam | cut -d: -f3)
 #UserNS=keep-id
 
 [Service]
