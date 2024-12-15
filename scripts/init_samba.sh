@@ -23,7 +23,7 @@ Environment=SHARE="cam1;/share/cam1;yes;no;yes;all;none;none cam2;/share/cam2;ye
 Environment=WORKGROUP=WORKGROUP
 Environment=USER="guest;guest"
 Environment=RECYCLE=false
-Environment=PERMISSIONS=false
+Environment=PERMISSIONS
 #UserNS=keep-id
 
 [Service]
