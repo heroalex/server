@@ -87,7 +87,7 @@ Requires=media-cam1.mount
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/chown root:storage-cam ${CAM1_MOUNT}
+ExecStart=/bin/chgrp storage-cam ${CAM1_MOUNT}
 ExecStart=/bin/chmod 770 ${CAM1_MOUNT}
 
 [Install]
@@ -103,7 +103,7 @@ Requires=media-cam2.mount
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/chown root:storage-cam ${CAM2_MOUNT}
+ExecStart=/bin/chgrp storage-cam ${CAM2_MOUNT}
 ExecStart=/bin/chmod 770 ${CAM2_MOUNT}
 
 [Install]

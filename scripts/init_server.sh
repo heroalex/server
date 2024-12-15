@@ -78,5 +78,7 @@ loginctl enable-linger ${USER_NAME}
 usermod --add-subuids 100000-165535 ${USER_NAME}
 usermod --add-subgids 100000-165535 ${USER_NAME}
 
+echo "*** run init_cam_loopback.sh"
 chmod +x /root/server/scripts/init_cam_loopback.sh
 /root/server/scripts/init_cam_loopback.sh
+

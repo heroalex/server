@@ -6,7 +6,7 @@ users:
   - name: ${USER_NAME}
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     shell: /bin/bash
-    groups: storage-l1
+    groups: storage-l1, storage-cam
     ssh_authorized_keys:
       - \"${SSH_KEY}\"
 
