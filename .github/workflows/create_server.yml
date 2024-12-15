@@ -1,0 +1,75 @@
+# This is a basic workflow that is manually triggered
+
+name: Create Server
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    inputs:
+      server_name:
+        description: ""
+        required: true
+        type: string
+      user_name:
+        description: ""
+        default: "al"
+        required: true
+        type: string
+      datacenter:
+        description: ""
+        default: "nbg1-dc3"
+        required: true
+        type: choice
+        options:
+          - "fsn1-dc14"
+          - "hel1-dc2"
+          - "nbg1-dc3"
+      image:
+        description: ""
+        default: "ubuntu-24.04"
+        required: true
+        type: choice
+        options:
+          - "ubuntu-24.04"
+          - "ubuntu-22.04"
+          - "rocky-9"
+      server_type:
+        description: ""
+        default: "cx22"
+        required: true
+        type: choice
+        options:
+          - "cx22"
+          - "cx32"
+          - "cax11"
+
+jobs:
+  # This workflow contains a single job called "greet"
+  create-server:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+            
+    # Runs a single command using the runners shell
+    - name: run script
+      env:
+        server_name: ${{ inputs.server_name }}
+        USER_NAME: ${{ inputs.user_name }}
+        datacenter: ${{ inputs.datacenter }}
+        image: ${{ inputs.image }}
+        server_type: ${{ inputs.server_type }}
+        FW_ID: ${{ secrets.FW_ID }}
+        IP_ID: ${{ contains(inputs.datacenter,'nbg') && secrets.IP_ID_NBG || contains(inputs.datacenter,'fsn') && secrets.IP_ID_FSN }}
+        SSH_ID: ${{ secrets.SSH_ID }}
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        WG_PRIV_KEY: ${{ secrets.WG_PRIV_KEY }}
+        WG_PUB_KEY: ${{ secrets.WG_PUB_KEY }}
+        API_TOKEN: ${{ secrets.API_TOKEN }}
+        STORAGE_L1: ${{ secrets.STORAGE_L1 }}
+        STORAGE_CAM: ${{ secrets.STORAGE_CAM }}
+      run: bash scripts/create_server.sh

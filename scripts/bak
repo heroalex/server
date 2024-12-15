@@ -1,0 +1,187 @@
+# init wwwuser
+cp -r /root/server/wwwuser /home/
+chown -R wwwuser:wwwuser /home/wwwuser
+chmod +x /home/wwwuser/init_wwwuser.sh
+
+loginctl enable-linger wwwuser
+usermod --add-subuids 200000-265535 wwwuser
+usermod --add-subgids 200000-265535 wwwuser
+
+podman load -q -i /root/server/wwwuser/.config/containers/storage/nginx.tar
+
+systemctl daemon-reload
+systemctl enable home-wwwuser-storage.mount
+systemctl start home-wwwuser-storage.mount
+
+cat /root/server/conf/nginx.service | bash -c "cat - | envsubst_user=wwwuser envsubst_uid=$(id -u -- wwwuser) envsubst > /etc/systemd/system/nginx.service"
+
+systemctl daemon-reload
+systemctl start nginx.socket
+
+su -c /home/wwwuser/init_wwwuser.sh
+
+# init camuser
+chown -R camuser:camuser /home/camuser
+loginctl enable-linger camuser
+systemctl daemon-reload
+systemctl enable home-camuser-storage.mount
+systemctl start home-camuser-storage.mount
+
+# Configuration
+IMAGE_SIZE="51200"
+STORAGE_BASE="/home/camuser/storage"
+MOUNT_BASE="/home/camuser"
+CAM1_IMAGE="${STORAGE_BASE}/cam1_.img"
+CAM2_IMAGE="${STORAGE_BASE}/cam2_.img"
+CAM1_MOUNT="${MOUNT_BASE}/cam1"
+CAM2_MOUNT="${MOUNT_BASE}/cam2"
+
+# Create necessary directories
+mkdir -p "${CAM1_MOUNT}"
+mkdir -p "${CAM2_MOUNT}"
+
+# Set ownership
+chown camuser:camuser "${CAM1_MOUNT}"
+chown camuser:camuser "${CAM2_MOUNT}"
+chmod 750 "${CAM1_MOUNT}" "${CAM2_MOUNT}"
+
+# Create image files if they don't exist
+for img in "${CAM1_IMAGE}" "${CAM2_IMAGE}"; do
+    if [ ! -f "${img}" ]; then
+        dd if=/dev/zero of="${img}" bs=1M count=0 seek=${IMAGE_SIZE} status=progress
+        mkfs.ext4 -F "${img}"
+        chown camuser:camuser "${img}"
+        chmod 600 "${img}"
+    fi
+done
+
+# Create systemd mount units
+cat > /etc/systemd/system/home-camuser-cam1.mount << EOF
+[Unit]
+Description=Camera 1 Storage Mount
+After=home-camuser-storage.mount
+Requires=home-camuser-storage.mount
+
+[Mount]
+What=${CAM1_IMAGE}
+Where=${CAM1_MOUNT}
+Type=ext4
+Options=loop,rw,nosuid,nodev,noexec,relatime
+DirectoryMode=0750
+User=camuser
+Group=camuser
+
+[Install]
+WantedBy=default.target
+EOF
+
+cat > /etc/systemd/system/home-camuser-cam2.mount << EOF
+[Unit]
+Description=Camera 2 Storage Mount
+After=home-camuser-storage.mount
+Requires=home-camuser-storage.mount
+
+[Mount]
+What=${CAM2_IMAGE}
+Where=${CAM2_MOUNT}
+Type=ext4
+Options=loop,rw,nosuid,nodev,noexec,relatime
+DirectoryMode=0750
+User=camuser
+Group=camuser
+
+[Install]
+WantedBy=default.target
+EOF
+
+# Reload systemd and enable mounts
+systemctl daemon-reload
+systemctl enable home-camuser-cam1.mount
+systemctl enable home-camuser-cam2.mount
+systemctl start home-camuser-cam1.mount
+systemctl start home-camuser-cam2.mount
+
+# samba shares
+
+#!/bin/bash
+
+# Create Samba configuration directory in camuser's home
+mkdir -p /home/camuser/.config/samba
+cat > /home/camuser/.config/samba/smb.conf << 'EOF'
+[global]
+workgroup = WORKGROUP
+server string = Camera Storage Server
+security = user
+map to guest = Bad User
+guest account = camuser
+log file = /tmp/samba-%m.log
+max log size = 50
+socket options = TCP_NODELAY SO_RCVBUF=65536 SO_SNDBUF=65536
+load printers = no
+printing = bsd
+printcap name = /dev/null
+disable spoolss = yes
+server min protocol = SMB2
+server max protocol = SMB3
+smb encrypt = disabled
+
+[cam1]
+path = /shares/cam1
+browseable = yes
+read only = no
+guest ok = yes
+create mask = 0660
+directory mask = 0770
+force user = camuser
+force group = camuser
+
+[cam2]
+path = /shares/cam2
+browseable = yes
+read only = no
+guest ok = yes
+create mask = 0660
+directory mask = 0770
+force user = camuser
+force group = camuser
+EOF
+
+# Create Podman Quadlet service file in user space
+mkdir -p /home/camuser/.config/containers/systemd
+cat > /home/camuser/.config/containers/systemd/samba.container << EOF
+[Container]
+Image=docker.io/dperson/samba:latest
+ContainerName=samba
+Network=host
+Volume=/home/camuser/.config/samba/smb.conf:/etc/samba/smb.conf:ro,z
+Volume=/home/camuser/cam1:/shares/cam1:rw,z
+Volume=/home/camuser/cam2:/shares/cam2:rw,z
+Environment=USERID=1001
+Environment=GROUPID=1001
+NetworkNS=host
+Timezone=local
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+
+# Create systemd user directory
+mkdir -p /home/camuser/.config/systemd/user/container-samba.service.d
+cat > /home/camuser/.config/systemd/user/container-samba.service.d/override.conf << EOF
+[Unit]
+After=home-camuser-cam1.mount home-camuser-cam2.mount network-online.target
+Requires=home-camuser-cam1.mount home-camuser-cam2.mount
+
+[Service]
+ExecStartPre=/usr/bin/sleep 5
+EOF
+
+# Set proper ownership and permissions
+chown -R camuser:camuser /home/camuser/.config
+
+# Enable and start the service as camuser
+systemctl --user --machine=camuser@ enable container-samba.service
+systemctl --user --machine=camuser@ start container-samba.service
