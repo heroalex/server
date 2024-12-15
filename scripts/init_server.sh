@@ -31,6 +31,7 @@ cat > /etc/.storage-l1.creds << EOF
 username=u324047-sub5
 password=${STORAGE_L1}
 EOF
+chmod 0600 /etc/.storage-l1.creds
 
 echo "*** start media-storage-l1.mount"
 systemctl daemon-reload
@@ -61,6 +62,7 @@ cat > /etc/.storage-cam.creds << EOF
 username=u324047-sub4
 password=${STORAGE_CAM}
 EOF
+chmod 0600 /etc/.storage-cam.creds
 
 echo "*** start media-storage-cam.mount"
 systemctl daemon-reload
@@ -75,3 +77,6 @@ echo "*** enable-linger & add subuids & subgids"
 loginctl enable-linger ${USER_NAME}
 usermod --add-subuids 100000-165535 ${USER_NAME}
 usermod --add-subgids 100000-165535 ${USER_NAME}
+
+chmod +x /root/server/scripts/init_cam_loopback.sh
+/root/server/scripts/init_cam_loopback.sh
