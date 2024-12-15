@@ -8,8 +8,8 @@ set -o nounset
 IMAGE_SIZE="51200"
 STORAGE_BASE="/media/storage/cam"
 MOUNT_BASE="/media"
-CAM1_IMAGE="${STORAGE_BASE}/cam1_.img"
-CAM2_IMAGE="${STORAGE_BASE}/cam2_.img"
+CAM1_IMAGE="${STORAGE_BASE}/cam1.img"
+CAM2_IMAGE="${STORAGE_BASE}/cam2.img"
 CAM1_MOUNT="${MOUNT_BASE}/cam1"
 CAM2_MOUNT="${MOUNT_BASE}/cam2"
 
