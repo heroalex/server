@@ -18,7 +18,7 @@ Image=docker.io/dperson/samba:latest
 ContainerName=samba-share
 Volume=/media/cam1:/share/cam1:Z
 Volume=/media/cam2:/share/cam2:Z
-#Network=host
+Network=host
 Environment=SHARE="cam1;/share/cam1;yes;no;yes;all;all;all cam2;/share/cam2;yes;no;yes;all;all;all"
 Environment=WORKGROUP=WORKGROUP
 Environment=NMBD=true
