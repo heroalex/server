@@ -82,3 +82,6 @@ echo "*** run init_cam_loopback.sh"
 chmod +x /root/server/scripts/init_cam_loopback.sh
 /root/server/scripts/init_cam_loopback.sh
 
+echo "*** run init_samba.sh"
+chmod +x /root/server/scripts/init_samba.sh
+/root/server/scripts/init_samba.sh
