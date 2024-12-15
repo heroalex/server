@@ -45,7 +45,7 @@ Requires=media-storage-cam.mount
 What=${CAM1_IMAGE}
 Where=${CAM1_MOUNT}
 Type=ext4
-Options=loop,rw,nosuid,nodev,noexec,relatime
+Options=loop,rw,nosuid,nodev,noexec,relatime,gid=storage-cam,dmask=027,fmask=137
 
 [Install]
 WantedBy=default.target
@@ -62,7 +62,7 @@ Requires=media-storage-cam.mount
 What=${CAM2_IMAGE}
 Where=${CAM2_MOUNT}
 Type=ext4
-Options=loop,rw,nosuid,nodev,noexec,relatime
+Options=loop,rw,nosuid,nodev,noexec,relatime,gid=storage-cam,dmask=027,fmask=137
 
 [Install]
 WantedBy=default.target
