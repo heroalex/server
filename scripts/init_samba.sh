@@ -27,7 +27,6 @@ Environment=USER="guest;guest"
 Environment=RECYCLE=false
 Environment=PERMISSIONS
 Environment=GROUPID=$(getent group storage-cam | cut -d: -f3)
-#UserNS=keep-id
 
 [Service]
 Restart=no
