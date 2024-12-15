@@ -25,7 +25,7 @@ Environment=WORKGROUP=WORKGROUP
 Environment=USER="guest;guest"
 Environment=RECYCLE=false
 Environment=PERMISSIONS
-UserNS=keep-id
+#UserNS=keep-id
 
 [Service]
 Restart=no
