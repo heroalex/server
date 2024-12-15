@@ -45,7 +45,7 @@ Requires=media-storage-cam.mount
 What=${CAM1_IMAGE}
 Where=${CAM1_MOUNT}
 Type=ext4
-Options=loop,rw,nosuid,nodev,noexec,relatime,gid=storage-cam,dmask=027,fmask=137
+Options=loop,rw,nosuid,nodev,noexec,relatime
 
 [Install]
 WantedBy=default.target
@@ -62,7 +62,7 @@ Requires=media-storage-cam.mount
 What=${CAM2_IMAGE}
 Where=${CAM2_MOUNT}
 Type=ext4
-Options=loop,rw,nosuid,nodev,noexec,relatime,gid=storage-cam,dmask=027,fmask=137
+Options=loop,rw,nosuid,nodev,noexec,relatime
 
 [Install]
 WantedBy=default.target
@@ -75,3 +75,45 @@ systemctl enable media-cam1.mount
 systemctl enable media-cam2.mount
 systemctl start media-cam1.mount
 systemctl start media-cam2.mount
+
+# set correct permissions of cam mounts
+echo "*** set correct permissions of cam mounts"
+cat > /etc/systemd/system/cam1-storage-permissions.service << EOF
+[Unit]
+Description=Set Camera 1 Storage Permissions
+After=media-cam1.mount
+Requires=media-cam1.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/chown root:storage-cam ${CAM1_MOUNT}
+ExecStart=/bin/chmod 770 ${CAM1_MOUNT}
+
+[Install]
+WantedBy=default.target
+EOF
+
+cat > /etc/systemd/system/cam2-storage-permissions.service << EOF
+[Unit]
+Description=Set Camera 2 Storage Permissions
+After=media-cam2.mount
+Requires=media-cam2.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/chown root:storage-cam ${CAM2_MOUNT}
+ExecStart=/bin/chmod 770 ${CAM2_MOUNT}
+
+[Install]
+WantedBy=default.target
+EOF
+
+# Reload systemd and enable mounts
+echo "*** enable & start cam1 & cam 2 -storage-permissions.service"
+systemctl daemon-reload
+systemctl enable cam1-storage-permissions.service
+systemctl enable cam2-storage-permissions.service
+systemctl start cam1-storage-permissions.service
+systemctl start cam2-storage-permissions.service
