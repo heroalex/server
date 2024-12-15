@@ -19,13 +19,11 @@ ContainerName=samba-share
 Volume=/media/cam1:/share/cam1:Z
 Volume=/media/cam2:/share/cam2:Z
 Network=host
-Environment=SHARE="cam1;/share/cam1;yes;no;no;all;none;none cam2;/share/cam2;yes;no;no;all;none;none"
+Environment=SHARE="cam1;/share/cam1;yes;no;yes;all;none;none cam2;/share/cam2;yes;no;yes;all;none;none"
 Environment=WORKGROUP=WORKGROUP
-Environment=NMBD=true
 Environment=USER="guest;guest"
-Environment=GUEST=true
-Environment=INTERFACE=172.16.16.0/24
 Environment=RECYCLE=false
+Environment=PERMISSIONS=false
 #UserNS=keep-id
 
 [Service]
