@@ -17,6 +17,7 @@ sudo apt-get install -y \
     cpu-checker \
     cloud-init \
     cloud-utils \
+    hcloud-cli \
     curl \
     unzip \
     jq \

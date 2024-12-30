@@ -8,12 +8,12 @@ qemu-system-x86_64 \
   -smp 2 \
   -m 2048 \
   -device virtio-net-pci,netdev=user.0 \
-  -netdev user,id=user.0,hostfwd=tcp::2222-:22 \
-  -drive file=output/microos-test,format=qcow2,if=virtio \
+  -netdev user,id=user.0,hostfwd=udp::13231-:13231 \
+  -drive file=output/microos,format=qcow2,if=virtio \
   -boot order=dc \
   -display vnc=:0 \
   -daemonize &
 
 echo "VM started in background. You can:"
 echo "1. Connect via VNC at localhost:5900"
-echo "2. SSH using: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 opensuse@localhost"
+echo "2. connect WG and SSH using: ssh -o StrictHostKeyChecking=no -i ~/.ssh/hetzner_L1_ed25519 root@172.16.16.1"

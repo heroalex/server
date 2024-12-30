@@ -1,0 +1,6 @@
+/control-system/variables.pkrvars.hcl
+/build-system/.secrets
+/build-system/cloud-init/seed.img
+/build-system/OpenSUSE-MicroOS.qcow2
+/build-system/output/microos
+/build-system/.secrets.local
