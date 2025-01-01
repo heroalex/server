@@ -13,7 +13,7 @@ PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 #UsePAM no
 X11Forwarding no
-AllowTcpForwarding no
+AllowTcpForwarding yes
 AllowAgentForwarding no
 PermitTunnel no
 PrintMotd yes

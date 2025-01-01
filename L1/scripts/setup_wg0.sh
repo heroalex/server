@@ -12,6 +12,10 @@ Address = 172.16.16.1/24
 [Peer]
 PublicKey = $WG0_PEER_1
 AllowedIPs = 172.16.16.90/32
+
+[Peer]
+PublicKey = $WG0_PEER_2
+AllowedIPs = 172.16.16.10/32,192.168.0.0/16
 EOF
 
 chmod 0600 /etc/wireguard/wg0.conf

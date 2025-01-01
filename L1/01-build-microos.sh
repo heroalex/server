@@ -4,14 +4,15 @@ set -e
 if [ -z $BUILD_TYPE ] && [ -z $1 ]; then
   echo "Defaulting build type to local"
   BUILD_TYPE=local
+  source .secrets/secrets-local-l1-pre
 fi
 if [ -z $BUILD_TYPE ]; then
   echo "BUILD_TYPE is unset. Setting to $1"
   BUILD_TYPE=$1
+  source .secrets/secrets-$1
 fi
 echo "BUILD_TYPE is set to '$BUILD_TYPE'"
 
-source .secrets
 
 # Check for HCLOUD_TOKEN if using hcloud environment
 if [ $BUILD_TYPE != "local" ] && [ -z "${HCLOUD_TOKEN:-}" ]; then
@@ -90,10 +91,10 @@ export PKR_VAR_microos_image_url="$MICROOS_IMAGE_URL"
 export PKR_VAR_microos_image_local="$MICROOS_IMAGE_LOCAL"
 export PKR_VAR_wg0_pk="$WG0_PK"
 export PKR_VAR_wg0_peer_1="$WG0_PEER_1"
-export PKR_VAR_storage_l1="$STORAGE_L1"
+export PKR_VAR_wg0_peer_2="$WG0_PEER_2"
+export PKR_VAR_storage_l1_u="$STORAGE_L1_U"
+export PKR_VAR_storage_l1_pw="$STORAGE_L1_PW"
 export PKR_VAR_storage_l1_url="$STORAGE_L1_URL"
-export PKR_VAR_storage_cam="$STORAGE_CAM"
-export PKR_VAR_storage_cam_url="$STORAGE_CAM_URL"
 
 # Run packer
 packer init hetzner.pkr.hcl

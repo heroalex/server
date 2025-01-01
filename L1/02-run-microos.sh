@@ -6,7 +6,7 @@ qemu-system-x86_64 \
   -cpu host \
   -machine type=q35,accel=kvm \
   -smp 2 \
-  -m 2048 \
+  -m 4096 \
   -device virtio-net-pci,netdev=user.0 \
   -netdev user,id=user.0,hostfwd=udp::13231-:13231 \
   -drive file=output/microos,format=qcow2,if=virtio \

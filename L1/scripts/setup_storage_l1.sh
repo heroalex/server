@@ -1,15 +1,12 @@
 #!/bin/bash
 set -eux
 
-groupadd storage_l1
-
 mkdir -p /var/mnt/storage_l1
-chgrp storage_l1 /var/mnt/storage_l1
-chmod 775 /var/mnt/storage_l1
+chmod 770 /var/mnt/storage_l1
 
 cat > /etc/storage_l1.creds <<  EOF
-username=u324047-sub5
-password=${STORAGE_L1}
+username=${STORAGE_L1_U}
+password=${STORAGE_L1_PW}
 EOF
 chmod 0600 /etc/storage_l1.creds
 
@@ -23,7 +20,7 @@ Wants=network-online.target
 What=${STORAGE_L1_URL}
 Where=/var/mnt/storage_l1
 Type=cifs
-Options=vers=3.1.1,gid=storage_l1,credentials=/etc/storage_l1.creds,file_mode=0660,dir_mode=0770,rw,_netdev
+Options=vers=3.1.1,credentials=/etc/storage_l1.creds,file_mode=0666,dir_mode=0777,rw,_netdev,nofail
 TimeoutSec=30
 
 [Install]
