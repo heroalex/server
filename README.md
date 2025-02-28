@@ -54,3 +54,18 @@ net use * /delete
 
 #### list firewall rules
 nft list ruleset
+
+#### Caddy reload Caddyfile
+podman exec -w /etc/caddy systemd-caddy caddy reload
+
+#### DEBUG Wireguard
+##### enable
+echo "module wireguard +p" | tee /sys/kernel/debug/dynamic_debug/control
+##### watch kernel log
+dmesg -wT
+##### disable
+echo "module wireguard -p" | tee /sys/kernel/debug/dynamic_debug/control
+
+#### Podman remove all images
+podman image prune -a
+

@@ -21,6 +21,7 @@ table inet filter {
 
         # Allow Wireguard
         udp dport 13231 accept
+        udp dport 13232 accept
 
         # Allow ICMP and ICMPv6 for basic network functionality
         # ip protocol icmp accept
@@ -28,6 +29,7 @@ table inet filter {
 
         # Allow all on Wireguard interface
         iifname "wg0" accept
+        iifname "wg1" accept
 
         # Optional: Allow HTTP/HTTPS
         tcp dport { 80, 443 } accept
@@ -42,6 +44,9 @@ table inet filter {
         # Allow forwarding on Wireguard interface if needed
         iifname "wg0" accept
         oifname "wg0" accept
+
+        iifname "wg1" accept
+        oifname "wg1" accept
 
         # Log dropped packets
         # log prefix "nft-forward-dropped: " counter drop

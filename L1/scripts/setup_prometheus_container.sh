@@ -3,7 +3,7 @@ set -eux
 
 # Create container configuration directory
 mkdir -p /etc/prometheus
-mkdir -p /var/lib/prometheus
+mkdir -p /mnt/volume1/prometheus
 
 cat > /etc/prometheus/prometheus.yml << EOF
 global:
@@ -19,12 +19,13 @@ EOF
 cat > /etc/containers/systemd/prometheus.container << EOF
 [Unit]
 Description=Prometheus Container
-After=network-online.target
+After=network-online.target mnt-volume1.mount node_exporter.service
+Requires=node_exporter.service mnt-volume1.mount
 
 [Container]
-Image=docker.io/prom/prometheus:latest
+Image=ghcr.io/heroalex/prometheus:main
 Volume=/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-Volume=/var/lib/prometheus:/prometheus:Z
+Volume=/mnt/volume1/prometheus:/prometheus
 Environment=TZ=UTC
 Network=host
 PublishPort=9090:9090
@@ -42,7 +43,7 @@ EOF
 # Set proper permissions
 chmod 644 /etc/prometheus/prometheus.yml
 chmod 644 /etc/containers/systemd/prometheus.container
-chown -R 65534:65534 /var/lib/prometheus
+chown -R 65534:65534 /mnt/volume1/prometheus
 
 # Reload systemd and enable container
 systemctl daemon-reload

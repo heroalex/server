@@ -1,10 +1,15 @@
 #!/bin/bash
-set -eux
+set -e
+
+echo "Creating Grafana config..."
+source /root/.secrets
+
+set -x
 
 # Create container configuration directory
-mkdir -p /var/lib/grafana/provisioning/datasources
+mkdir -p /mnt/volume1/grafana/provisioning/datasources
 
-cat > /var/lib/grafana/provisioning/datasources/prometheus.yaml << 'EOF'
+cat > /mnt/volume1/grafana/provisioning/datasources/prometheus.yaml << 'EOF'
 apiVersion: 1
 datasources:
   - name: Prometheus
@@ -19,16 +24,18 @@ EOF
 cat > /etc/containers/systemd/grafana.container << EOF
 [Unit]
 Description=Prometheus Container
-After=network-online.target
+After=network-online.target prometheus.service
+Requires=prometheus.service
 
 [Container]
-Image=docker.io/grafana/grafana:latest
+Image=ghcr.io/heroalex/grafana:main
 PublishPort=3000:3000
 Network=host
-Volume=/var/lib/grafana:/var/lib/grafana:Z
+Volume=/mnt/volume1/grafana:/var/lib/grafana
 Environment=GF_SECURITY_ALLOW_EMBEDDING=false
 Environment=GF_SECURITY_DISABLE_GRAVATAR=true
 Environment=GF_USERS_ALLOW_SIGN_UP=false
+Environment=GF_SERVER_ROOT_URL=https://${GRAFANA_DOMAIN_1}
 Label=io.containers.autoupdate=registry
 
 [Service]
@@ -41,9 +48,9 @@ WantedBy=multi-user.target
 EOF
 
 # Set proper permissions
-chmod 644 /var/lib/grafana/provisioning/datasources/prometheus.yaml
+chmod 644 /mnt/volume1/grafana/provisioning/datasources/prometheus.yaml
 chmod 644 /etc/containers/systemd/grafana.container
-chown -R 472:472 /var/lib/grafana
+chown -R 472:472 /mnt/volume1/grafana
 
 # Reload systemd and enable container
 systemctl daemon-reload

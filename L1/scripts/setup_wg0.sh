@@ -1,21 +1,28 @@
 #!/bin/bash
-set -eux
+set -e
 
 echo "Creating wg0 config..."
+source /root/.secrets
+
+set -x
 
 cat > /etc/wireguard/wg0.conf << EOF
 [Interface]
-PrivateKey = $WG0_PK
+PrivateKey = ${WG0_PK}
 ListenPort = 13231
-Address = 172.16.16.1/24
+Address = ${WG0_IP_PREFIX}.1/24
 
 [Peer]
-PublicKey = $WG0_PEER_1
-AllowedIPs = 172.16.16.90/32
+PublicKey = ${WG0_PEER_1}
+AllowedIPs = ${WG0_IP_PREFIX}.90/32
 
 [Peer]
-PublicKey = $WG0_PEER_2
-AllowedIPs = 172.16.16.10/32,192.168.0.0/16
+PublicKey = ${WG0_PEER_2}
+AllowedIPs = ${WG0_IP_PREFIX}.10/32,192.168.0.0/16
+
+[Peer]
+PublicKey = ${WG0_PEER_3}
+AllowedIPs = ${WG0_IP_PREFIX}.92/32
 EOF
 
 chmod 0600 /etc/wireguard/wg0.conf

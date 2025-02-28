@@ -1,5 +1,10 @@
 #!/bin/bash
-set -eux
+set -e
+
+echo "Creating storage_l1 mount..."
+source /root/.secrets
+
+set -x
 
 mkdir -p /var/mnt/storage_l1
 chmod 770 /var/mnt/storage_l1
@@ -12,7 +17,7 @@ chmod 0600 /etc/storage_l1.creds
 
 cat > /etc/systemd/system/var-mnt-storage_l1.mount << EOF
 [Unit]
-Description=Storage L1 CIFS Share Mount
+Description=Storage L1 SMB Share Mount
 After=network-online.target
 Wants=network-online.target
 
@@ -20,7 +25,8 @@ Wants=network-online.target
 What=${STORAGE_L1_URL}
 Where=/var/mnt/storage_l1
 Type=cifs
-Options=vers=3.1.1,credentials=/etc/storage_l1.creds,file_mode=0666,dir_mode=0777,rw,_netdev,nofail
+# nobrl needed for vaultwarden container
+Options=vers=3.1.1,credentials=/etc/storage_l1.creds,file_mode=0666,dir_mode=0777,rw,_netdev,nofail,nobrl
 TimeoutSec=30
 
 [Install]

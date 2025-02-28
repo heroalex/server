@@ -1,7 +1,12 @@
 #!/bin/bash
-set -eux
+set -e
 
-usermod -p '*' ${USERNAME}
+echo "Creating sshd_config..."
+source /root/.secrets
+
+set -x
+
+usermod -p '*' ${SSH_USERNAME}
 
 cat > /etc/ssh/sshd_config.d/40-sshd-harden.conf << EOF
 Port 22
@@ -18,8 +23,8 @@ AllowAgentForwarding no
 PermitTunnel no
 PrintMotd yes
 AcceptEnv LANG LC_*
-AllowUsers ${USERNAME}
-ListenAddress 172.16.16.1
+AllowUsers ${SSH_USERNAME}
+ListenAddress ${WG0_IP_PREFIX}.1
 EOF
 
 chmod 0600 /etc/ssh/sshd_config.d/40-sshd-harden.conf

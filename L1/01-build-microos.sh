@@ -44,10 +44,9 @@ MICROOS_CHECKSUM="sha256:a6288b97af5a40c89c28a528b9952e0a6ef3dfc49686e25d3957ff2
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "${TEMP_DIR}"' EXIT
 
-# Process cloud-init configuration
+# Process cloud-init configuration for local qemu
 echo "Processing cloud-init configuration..."
 export SSH_PUBLIC_KEY="$(cat ${SSH_KEY_PATH}.pub)"
-export SSH_USERNAME="root"
 cat > "${TEMP_DIR}/user-data" << EOF
 #cloud-config
 system_info:
@@ -82,6 +81,13 @@ if [ -d "output" ]; then
     rm -rf output
 fi
 
+VOLUME_LOCAL="./volume10G.raw"
+# Create volume for QEMU
+if [ $BUILD_TYPE = "local" ] && [ ! -f "$VOLUME_LOCAL" ]; then
+    echo "Creating volume for QEMU..."
+    qemu-img create -f raw $VOLUME_LOCAL 10G
+fi
+
 # Export environment variables for Packer
 export PKR_VAR_build_type="$BUILD_TYPE"
 export PKR_VAR_ssh_username="$SSH_USERNAME"
@@ -89,12 +95,7 @@ export PKR_VAR_ssh_private_key="$SSH_KEY_PATH"
 export PKR_VAR_microos_image_checksum="$MICROOS_CHECKSUM"
 export PKR_VAR_microos_image_url="$MICROOS_IMAGE_URL"
 export PKR_VAR_microos_image_local="$MICROOS_IMAGE_LOCAL"
-export PKR_VAR_wg0_pk="$WG0_PK"
-export PKR_VAR_wg0_peer_1="$WG0_PEER_1"
-export PKR_VAR_wg0_peer_2="$WG0_PEER_2"
-export PKR_VAR_storage_l1_u="$STORAGE_L1_U"
-export PKR_VAR_storage_l1_pw="$STORAGE_L1_PW"
-export PKR_VAR_storage_l1_url="$STORAGE_L1_URL"
+#export PKR_VAR_volume_local="$VOLUME_LOCAL"
 
 # Run packer
 packer init hetzner.pkr.hcl

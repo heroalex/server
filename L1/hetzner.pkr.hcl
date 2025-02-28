@@ -17,12 +17,7 @@ variable "ssh_private_key" {}
 variable "microos_image_checksum" {}
 variable "microos_image_url" {}
 variable "microos_image_local" {}
-variable "wg0_pk" {}
-variable "wg0_peer_1" {}
-variable "wg0_peer_2" {}
-variable "storage_l1_u" {}
-variable "storage_l1_pw" {}
-variable "storage_l1_url" {}
+# variable "volume_local" {}
 
 locals {
   needed_packages = "policycoreutils setools-console audit bind-utils wireguard-tools open-iscsi nfs-kernel-server nfs-client xfsprogs cryptsetup lvm2 git cifs-utils bash-completion mtr tcpdump systemd-container"
@@ -46,6 +41,8 @@ locals {
     sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/' /etc/default/grub
     sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet systemd.show_status=yes console=ttyS0,115200 console=tty0 ignition.platform.id=openstack security=selinux selinux=0"/' /etc/default/grub
     grub2-mkconfig -o /boot/grub2/grub.cfg
+    mkdir /mnt/volume1
+    chmod 660 /mnt/volume1
     setenforce 0
     restorecon -Rv /etc/selinux/targeted/policy
     restorecon -Rv /var/lib
@@ -91,9 +88,9 @@ source "qemu" "microos" {
     ["-machine", "type=q35,accel=kvm"],
     ["-device", "virtio-net-pci,netdev=user.0"],
     ["-netdev", "user,id=user.0,hostfwd=tcp::2222-:22"],
-    ["-drive", "file=output/microos,format=qcow2,if=virtio,cache=writeback,discard=ignore,detect-zeroes=off"],
-    ["-drive", "file=cloud-init/seed.img,format=raw,if=virtio"],
-    ["-boot", "order=dc"]
+    ["-drive", "file=output/microos,format=qcow2,if=virtio,cache=writeback,discard=ignore,detect-zeroes=off,index=1"],
+    # ["-drive", "file=${var.volume_local},format=raw,if=virtio,index=2"],
+    ["-drive", "file=cloud-init/seed.img,format=raw,if=virtio,index=0"],
   ]
 }
 
@@ -105,8 +102,8 @@ source "hcloud" "microos" {
   # server_type = "cx32"  # 4 / 8  / 80  / 7.4970€
   # server_type = "cx42"  # 8 / 16 / 160 / 18.9210€
   # server_type = "cpx11" # 2 / 2  / 40  / 4.5815€
-  server_type = "cpx21" # 3 / 4  / 80  / 8.3895€
-  # server_type = "cpx31"   # 4 / 8  / 160 / 15.5890€
+  # server_type = "cpx21" # 3 / 4  / 80  / 8.3895€
+  server_type = "cpx31"   # 4 / 8  / 160 / 15.5890€
   # server_type = "cax21" # 4 / 8  / 80  / 7.1281€
   # server_type = "cax31" # 8 / 16 / 160 / 14.2681€
   # server_type = "ccx13" # 2 / 8  / 80  / 14.2681€
@@ -114,7 +111,7 @@ source "hcloud" "microos" {
     microos-snapshot = "yes"
     creator          = "packer"
   }
-  snapshot_name = "OpenSUSE MicroOS x86"
+  snapshot_name = "OpenSUSE MicroOS x86 - ${var.build_type}"
   ssh_username  = var.ssh_username
   ssh_keys = [8691126]  // alex@LAPTOP
   public_ipv4 = "75865727" // 159.69.48.78 L1-Pre-FSN
@@ -154,71 +151,33 @@ build {
     note    = "breakpoint before scripts"
   }
 
+  provisioner "file" {
+    source = var.build_type == "local" ? ".secrets/secrets-local-l1-pre" : ".secrets/secrets-${var.build_type}"
+    destination = "/root/.secrets"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod 600 /root/.secrets",  # Set file permissions to read/write for root only
+      "chown root:root /root/.secrets"  # Ensure the file is owned by root
+    ]
+  }
+
   provisioner "shell" {
     pause_before      = "5s"
     scripts       = [
       "scripts/enable_ipv4_forwarding.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    scripts       = [
       "scripts/disable_ipv6.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    environment_vars = [
-      "WG0_PK=${var.wg0_pk}",
-      "WG0_PEER_1=${var.wg0_peer_1}",
-      "WG0_PEER_2=${var.wg0_peer_2}",
-    ]
-    scripts       = [
       "scripts/setup_wg0.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    environment_vars = [
-      "USERNAME=${var.ssh_username}",
-    ]
-    scripts       = [
       "scripts/setup_sshd.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    environment_vars = [
-      "STORAGE_L1_U=${var.storage_l1_u}",
-      "STORAGE_L1_PW=${var.storage_l1_pw}",
-      "STORAGE_L1_URL=${var.storage_l1_url}",
-    ]
-    scripts       = [
-      "scripts/setup_storage_l1.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    scripts       = [
-      "scripts/setup_storage_cam_loops.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    scripts       = [
-      "scripts/setup_nfs_server.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    scripts       = [
-      "scripts/setup_samba_container.sh",
-    ]
-  }
-
-  provisioner "shell" {
-    scripts       = [
       "scripts/setup_firewall.sh",
+    ]
+  }
+
+  provisioner "shell" {
+    only  = ["hcloud.microos"]
+    scripts       = [
+      "scripts/setup_wg1.sh",
     ]
   }
 
@@ -233,27 +192,16 @@ build {
   }
 
   # provisioner "shell" {
+  #   only=["hcloud.microos"]
   #   scripts       = [
-  #     "scripts/setup_nginx_container.sh",
-  #   ]
-  # }
-  #
-  # provisioner "shell" {
-  #   scripts       = [
-  #     "scripts/setup_nextcloud_container.sh",
-  #   ]
-  # }
-
-  #
-  # provisioner "shell" {
-  #   scripts       = [
-  #     # "scripts/setup_swap.sh",
+  #     "scripts/setup_swap.sh",
   #   ]
   # }
 
   provisioner "shell" {
     scripts       = [
       "scripts/cleanup.sh",
+      "scripts/setup_first_boot.sh",
     ]
   }
 

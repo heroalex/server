@@ -32,11 +32,11 @@ EOF
 cat > /etc/containers/systemd/samba.container << EOF
 [Unit]
 Description=Samba Container
-After=network-online.target var-mnt-storage_l1 wg-quick@wg0.service
-Requires=var-mnt-storage_l1 wg-quick@wg0.service
+After=network-online.target var-mnt-storage_l1.mount wg-quick@wg0.service mnt-volume1.mount
+Requires=var-mnt-storage_l1.mount wg-quick@wg0.service mnt-volume1.mount
 
 [Container]
-Image=docker.io/dperson/samba:latest
+Image=ghcr.io/heroalex/samba:master
 Network=host
 Volume=/etc/samba/smb.conf:/etc/samba/smb.conf
 Volume=/var/mnt/storage_l1:/shares

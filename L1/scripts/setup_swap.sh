@@ -27,5 +27,6 @@ WantedBy=multi-user.target
 EOF
 
 # Enable and start swap
-systemctl enable var-swapfile.swap
-systemctl start var-swapfile.swap
+#systemctl enable var-swapfile.swap
+#systemctl start var-swapfile.swap
+# swapon: /var/swapfile: swapon failed: Read-only file system
